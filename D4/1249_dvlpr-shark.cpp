@@ -1,91 +1,85 @@
 
-/**
- * @author : Jihoon Jang
- */
-
-#include <stdio.h>
+#include <iostream>
 #include <queue>
+#include <memory.h>
 
-#define MAX_MAP_SIZE 101
-#define MAX_INT 0x7EEEEEEE
+#define SIZE 101
+#define INF 987654321
 
 using namespace std;
 
+typedef struct qnode
+{
+	int x, y;
+	qnode(int x, int y):x(x), y(y){}
+}qnode;
+
+int map[SIZE][SIZE];
+int price[SIZE][SIZE];
 int dx[] = {0, 1, 0, -1};
 int dy[] = {-1, 0, 1, 0};
 
-typedef struct element
+void input(int &n, queue<qnode> &q)
 {
-	int x, y;
-	element(int _x, int _y)
-	{
-		x = _x;
-		y = _y;
+	cin >> n;
+	for(int i=0; i<n; i++){
+		for(int j=0; j<n; j++){
+			char ch;
+			cin >> ch;
+			map[i][j] = ch - '0';
+			price[i][j] = INF;
+		}
 	}
-}element;
+	price[0][0] = 0;
+	q.push(qnode(0, 0));
+}
 
 bool isWall(int x, int y, int n)
 {
 	return (x<0 || y<0 || x>=n || y>=n);
 }
 
-bool isCanGo(int x, int y, int n)
+bool isLowerPrice(int nx, int ny, int x, int y)
 {
-	if(isWall(x, y, n))
-		return false;
-	else
-		return true;
+	return (price[ny][nx] > price[y][x] + map[ny][nx]);
 }
 
-bool isMin(int x, int y, int nx, int ny, int map[][MAX_MAP_SIZE], int distance[][MAX_MAP_SIZE])
+void pushPrice(int nx, int ny, int x, int y)
 {
-	return (distance[ny][nx] > distance[y][x] + map[ny][nx]);
+	price[ny][nx] = price[y][x] + map[ny][nx];
 }
 
-void bfs(int map[][MAX_MAP_SIZE], queue<element> &q, int n, int distance[][MAX_MAP_SIZE])
+int bfs(int n, queue<qnode> &q)
 {
 	while(!q.empty()){
-		int x = q.front().x;
-		int y = q.front().y;
-		q.pop();
-		for(int type=0; type<4; type++){
-			int nx = x + dx[type];
-			int ny = y + dy[type];
-			if(nx >= 0 && ny >= 0 && nx < n && ny < n){
-				if(distance[ny][nx] > map[ny][nx] + distance[y][x]){
-					distance[ny][nx] = map[ny][nx] + distance[y][x];
-					q.push(element(nx, ny));
-				}
+		int x = q.front().x,  y = q.front().y;	q.pop();
+		for(int i=0; i<4; i++){
+			int nx = x + dx[i];
+			int ny = y + dy[i];
+			if(isWall(nx, ny, n))
+				continue;
+			if(isLowerPrice(nx, ny, x, y)){
+				pushPrice(nx, ny, x, y);
+				q.push(qnode(nx, ny));
 			}
 		}
 	}
+	return price[n-1][n-1];
 }
-
 
 int main(void)
 {
-	setbuf(stdout, NULL);
 	//freopen("input.txt", "r", stdin);
-	int T;
-	scanf("%d", &T);
-	for(int tc=1; tc<=T; tc++){
-		int map[MAX_MAP_SIZE][MAX_MAP_SIZE] = {0, };
-		int distance[MAX_MAP_SIZE][MAX_MAP_SIZE];
-		int N;
-		scanf("%d", &N);					// ют╥б
-		for(int i=0; i<N; i++){
-			for(int j=0; j<N; j++){
-				scanf("%1d", &map[i][j]);
-				distance[i][j] = MAX_INT;
-			}
-		}
-		distance[0][0] = 0;
-		queue<element> q;
-		q.push(element(0, 0));
-		bfs(map, q, N, distance);
-		int ans = distance[N-1][N-1];
-		printf("#%d %d\n", tc, ans);
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);	cout.tie(NULL);
+	int t;
+	cin >> t;
+	for(int tc=1; tc<=t; tc++){
+		int n;
+		queue<qnode> q;
+		input(n, q);
+		int ans = bfs(n, q);
+		cout << "#" << tc << " " << ans << '\n';
 	}
-
 	return 0;
 }
