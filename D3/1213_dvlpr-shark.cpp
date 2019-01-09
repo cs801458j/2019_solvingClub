@@ -1,62 +1,63 @@
-#include <stdio.h>
-#include <string.h>
 
-#define MAX_SENTENCE 1001
-#define MAX_STRING 11
+/**
+  * @author Jihoon Jang
+  */
 
-void input(char*, char*);
-void ClearBuffer(void);
-int findStr(char*, char*);
-int Solve(char*, char*);
+#include <iostream>
 
-int main(void)
+#define SOURCE_SIZE 1001
+#define TARGET_SIZE 11
+
+using namespace std;
+
+void input(char *source, char *target)
 {
-	int T = 10;
-	//freopen("input.txt", "r", stdin);
-	setbuf(stdout, NULL);
-	for(int i=1; i<=T; i++){
-		/* Algorithm */
-		char str[MAX_STRING] = {0, };
-		char sentence[MAX_SENTENCE] = {0, };
-		int ans;
-		ClearBuffer();
-		input(str, sentence);
-		ans = Solve(str, sentence);
-		printf("#%d %d\n", i, ans);
-	}
-
-	return 0;
+	cin >> target >> source;
 }
 
-void input(char* str, char* stc)
+int getStrLen(char *str)
 {
-	scanf("%s", str);
-	scanf("%s", stc);
+	int ret=0;
+	for(;str[ret];ret++){}
+	return ret;
 }
 
-void ClearBuffer(void)
+bool isSameString(char *str1, char *str2, int len)
 {
-	int temp;
-	scanf("%d", &temp);
-}
-
-int findStr(char* str, char* stc)
-{
-	int len = strlen(str);
-	for(int i=0; i<len; i++){
-		if(str[i] != stc[i])
+	while(len--){
+		if(*str1 != *str2)
 			return false;
+		str1++, str2++;
 	}
 	return true;
 }
 
-int Solve(char* str, char* stc)
+int solve(char *source, char *target)
 {
-	int n = strlen(stc);
-	int result = 0;
-	for(int i=0; i<n ;i++){
-		if(findStr(str, stc+i))
-			result++;
+	int ret = 0;
+	int len = getStrLen(target);
+	int loop = getStrLen(source) - len + 1;
+	for(int i=0; i<loop; i++){
+		if(isSameString(source+i, target, len))
+			ret++;
 	}
-	return result;
+	return ret;
+}
+
+
+int main(void)
+{
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);	cout.tie(NULL);
+	//freopen("input.txt", "r", stdin);
+	for(int tc=1; tc<=10; tc++){
+		int temp;
+		cin >> temp;
+		char source[SOURCE_SIZE] = {0, };
+		char target[TARGET_SIZE] = {0, };
+		input(source, target);
+		cout << "#" << tc << " " << solve(source, target) << '\n';
+	}
+
+	return 0;
 }
