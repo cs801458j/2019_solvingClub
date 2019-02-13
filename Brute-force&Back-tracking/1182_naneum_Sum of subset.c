@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+//#include <bits/stdc++.h> GCC
 int N, S, num[20];
 int visited[20];
 int ans = 0;
